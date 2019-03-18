@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: lebron769
+    #    注意这里没有3306端口的
+    url: jdbc:mysql://localhost/sl?characterEncoding=utf-8&useSSL=false
+
+  jpa:
+    #    控制台显示sql
+    show-sql: true
+#  thymeleaf:
+#    enabled: true
+#      encoding: utf-8
+#      mode: HTML5
+#      prefix: classpath:/templates/
+#      suffix: .html

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .flex-container {
+            /*display: -webkit-flex;*/
+            /*可伸缩*/
+            display: flex;
+            /*wrap表示支持换行,该属性是个复属性，它是flex-direction和flex-wrap的复合属性*/
+            flex-flow: row wrap;
+            /*space-between表示两端对齐并将剩余空间在主轴方向上进行平均分配*/
+            /*space-around让可伸缩项目沿着主轴方向进行了居中对齐并且均分了剩余空间*/
+            justify-content: flex-start;
+            margin-top: 8px
+        }
+
+        .flex-item {
+            width: 350px;
+            -webkit-flex-grow: 1;
+            -webkit-flex-shrink: 1;
+            flex-grow: 1;
+            flex-shrink: 1;
+        }
+
+    </style>
+    <link rel="stylesheet"  th:href="@{asserts/css/bootstrap.css}">
+    <link rel="stylesheet"  th:href="@{asserts/css/font-awesome.min.css}">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Concept</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="btn btn-warning fa-lg" href="#" onclick="save()"><i class="fa fa-save fa-lg pull-left"></i> Save </a>
+            </li>
+            <div class="nav-item dropdown">
+                <a class="btn btn-danger fa-lg" onclick="loadNamedelete()" data-toggle="dropdown">
+                    <i class="fa fa-trash-o fa-lg"></i> Delete</a>
+                </a>
+                <ul class="dropdown-menu" id="Concept_list2">
+
+                </ul>
+            </div>
+            <li class="nav-item dropdown">
+                <a class="btn btn-success fa-lg" data-toggle="dropdown" href="#">
+                    <i class="fa fa-plus fa-lg pull-left"></i> Add File
+                </a>
+                <div class="dropdown-menu">
+                    <ul class="input-group margin-bottom-sm">
+                        <a class="input-group-addon"><i class="fa fa-file-text fa-fg"></i></a>
+                        <input class="form-control" type="text" placeholder="filename" id="addfilename">
+                        <a class="input-group-addon" href="#" onclick="saveFilename()"><i class="fa fa-plus fa-lg"></i></a>
+                    </ul>
+                </div>
+            </li>
+            <div class="nav-item dropdown">
+                <a class="btn btn-primary fa-lg" onclick="loadName()" data-toggle="dropdown">
+                    <i class="fa fa-file-text fa-lg pull-left"></i> Load
+                </a>
+                <ul class="dropdown-menu" id="Concept_list">
+
+                </ul>
+            </div>
+            <li class="nav-item">
+                <a class="btn btn-warning fa-lg" href="/thumbNail"><i class="fa fa-save fa-lg pull-left"></i> ThumbNail </a>
+            </li>
+            <li class="nav-item">
+                <a class="btn btn-warning fa-lg" onclick="merge()"><i class="fa fa-save fa-lg pull-left"></i> Merge </a>
+            </li>
+            <li class="nav-item">
+                <a class="btn btn-warning fa-lg" href="/main"><i class="fa fa-save fa-lg pull-left"></i> back </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<form name="itemsForm" method="post">
+    <div class="flex-container">
+        <div class="flex-item" th:each="curname:${files}">
+            <a th:href="@{'/main?filename='+${curname.name}}">
+                <img th:src="@{'/pic/'+${curname.name}+'.png'}" class="img-responsive img-thumbnail" width="350" height="200">
+                <div>
+                    <h3 th:text="${curname.name}" style="color:black;display:inline;"></h3>
+                    <input type="checkbox" name="names" th:value="${curname.name}">
+                </div>
+            </a>
+        </div>
+    </div>
+</form>
+<script id="code" th:inline="JavaScript">
+    function init() {
+        var filename=[[${fn}]];
+        // if (window.goSamples) goSamples();  // init for these samples -- you don't need to call this
+        var Commander = go.GraphObject.make;  // for conciseness in defining templates
+
+        var yellowgrad = Commander(go.Brush, "Linear", { 0: "rgb(254, 201, 0)", 1: "rgb(254, 162, 0)" });
+        var greengrad = Commander(go.Brush, "Linear", { 0: "#98FB98", 1: "#9ACD32" });
+        var bluegrad = Commander(go.Brush, "Linear", { 0: "#B0E0E6", 1: "#87CEEB" });
+        var redgrad = Commander(go.Brush, "Linear", { 0: "#C45245", 1: "#871E1B" });
+        var whitegrad = Commander(go.Brush, "Linear", { 0: "#F0F8FF", 1: "#E6E6FA" });
+
+        var bigfont = "bold 13pt Helvetica, Arial, sans-serif";
+        var smallfont = "bold 11pt Helvetica, Arial, sans-serif";
+
+        // Common text styling
+        function textStyle() {
+            return {
+                margin: 6,
+                wrap: go.TextBlock.WrapFit,
+                textAlign: "center",
+                editable: true,
+                font: "19pt helvetica, arial, sans-serif"
+            }
+        }
+
+        myDiagram =
+            Commander(go.Diagram, "myDiagramDiv",
+                {
+                    // have mouse wheel events zoom in and out instead of scroll up and down
+                    "toolManager.mouseWheelBehavior": go.ToolManager.WheelZoom,
+                    allowDrop: true,  // support drag-and-drop from the Palette
+                    initialAutoScale: go.Diagram.Uniform,
+                    "linkingTool.direction": go.LinkingTool.ForwardsOnly,
+                    initialContentAlignment: go.Spot.Center,
+                    layout: Commander(go.LayeredDigraphLayout, { isInitial: false, isOngoing: false, layerSpacing: 50 }),
+                    "undoManager.isEnabled": true
+                });
+
+        // when the document is modified, add a "*" to the title and enable the "Save" button
+        myDiagram.addDiagramListener("Modified", function(e) {
+            var button = document.getElementById("SaveButton");
+            if (button) button.disabled = !myDiagram.isModified;
+            var idx = document.title.indexOf("*");
+            if (myDiagram.isModified) {
+                if (idx < 0) document.title += "*";
+            } else {
+                if (idx >= 0) document.title = document.title.substr(0, idx);
+            }
+        });
+
+        //右上角小加号
+        var defaultAdornment =
+            Commander(go.Adornment, "Spot",
+                Commander(go.Panel, "Auto",
+                    Commander(go.Shape, { fill: null, stroke: "dodgerblue", strokeWidth: 4 }),
+                    Commander(go.Placeholder)),
+                // the button to create a "next" node, at the top-right corner
+                Commander("Button",
+                    { alignment: go.Spot.TopRight,
+                        click: addNodeAndLink },  // this function is defined below
+                    new go.Binding("visible", "", function(a) { return !a.diagram.isReadOnly; }).ofObject(),
+                    Commander(go.Shape, "PlusLine", { desiredSize: new go.Size(6, 6) })
+                )
+            );
+
+
+        myDiagram.nodeTemplateMap.add("attribute",
+            Commander(go.Node, "Auto",
+                new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
+                Commander(go.Shape, "RoundedRectangle",
+                    { fill: bluegrad,
+                        portId: "",
+                        fromLinkable: true, fromLinkableSelfNode: true, fromLinkableDuplicates: true,
+                        toLinkable: true, toLinkableSelfNode: true, toLinkableDuplicates: true,
+                        cursor: "pointer",
+                        fromEndSegmentLength: 40}),
+                Commander(go.TextBlock, "attribute", textStyle(),
+                    new go.Binding("text", "text").makeTwoWay())
+            ));
+
+        myDiagram.nodeTemplateMap.add("entity",
+            Commander(go.Node, "Auto",
+                new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
+                // define the node's outer shape, which will surround the TextBlock
+                Commander(go.Shape, "RoundedRectangle",
+                    {
+                        parameter1: 20,  // the corner has a large radius
+                        fill: Commander(go.Brush, "Linear", { 0: "rgb(254, 201, 0)", 1: "rgb(254, 162, 0)" }),
+                        stroke: null,
+                        portId: "",  // this Shape is the Node's port, not the whole Node
+                        fromLinkable: true, fromLinkableSelfNode: true, fromLinkableDuplicates: true,
+                        toLinkable: true, toLinkableSelfNode: true, toLinkableDuplicates: true,
+                        cursor: "pointer"
+                    }),
+                Commander(go.TextBlock,"entity",textStyle(),
+                    // {
+                    //     font: "bold 11pt helvetica, bold arial, sans-serif",
+                    //     editable: true  // editing the text automatically updates the model data
+                    // },
+                    new go.Binding("text").makeTwoWay())
+            ));
+
+
+        myDiagram.nodeTemplateMap.add("ability",
+            Commander(go.Node, "Auto",
+                new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
+                Commander(go.Shape, "RoundedRectangle",
+                    { fill: greengrad,
+                        portId: "",
+                        fromLinkable: true, fromLinkableSelfNode: true, fromLinkableDuplicates: true,
+                        toLinkable: true, toLinkableSelfNode: true, toLinkableDuplicates: true,
+                        cursor: "pointer",
+                        fromEndSegmentLength: 40}),
+                Commander(go.TextBlock, "ability", textStyle(),
+                    new go.Binding("text", "text").makeTwoWay())
+            ));
+
+
+        // clicking the button of a default node inserts a new node to the right of the selected node,
+        // and adds a link to that new node
+        function addNodeAndLink(e, obj) {
+            var adorn = obj.part;
+            if (adorn === null) return;
+            e.handled = true;
+            var diagram = adorn.diagram;
+            diagram.startTransaction("Add State");
+            // get the node data for which the user clicked the button
+            var fromNode = adorn.adornedPart;
+            var fromData = fromNode.data;
+            // create a new "State" data object, positioned off to the right of the adorned Node
+            var toData = { text: "new" };
+            var p = fromNode.location;
+            toData.loc = p.x + 200 + " " + p.y;  // the "loc" property is a string, not a Point object
+            // add the new node data to the model
+            var model = diagram.model;
+            model.addNodeData(toData);
+            // create a link data from the old node data to the new node data
+            var linkdata = {};
+            linkdata[model.linkFromKeyProperty] = model.getKeyForNodeData(fromData);
+            linkdata[model.linkToKeyProperty] = model.getKeyForNodeData(toData);
+            // and add the link data to the model
+            model.addLinkData(linkdata);
+            // select the new Node
+            var newnode = diagram.findNodeForData(toData);
+            diagram.select(newnode);
+            diagram.commitTransaction("Add State");
+        }
+
+        // // replace the default Link template in the linkTemplateMap
+        // myDiagram.linkTemplate =
+        //   Commander(go.Link,  // the whole link panel
+        //     new go.Binding("points").makeTwoWay(),
+        //     { curve: go.Link.Bezier, toShortLength: 15 },
+        //     new go.Binding("curviness", "curviness"),
+        //     Commander(go.Shape,  // the link shape
+        //       { stroke: "#2F4F4F", strokeWidth: 2.5 }),
+        //     Commander(go.Shape,  // the arrowhead
+        //       { toArrow: "kite", fill: "#2F4F4F", stroke: null, scale: 2 })
+        // );
+        //
+        // myDiagram.linkTemplateMap.add("Comment",
+        //   Commander(go.Link, { selectable: true },
+        //     Commander(go.Shape, { strokeWidth: 2, stroke: "darkgreen" })));
+
+        // replace the default Link template in the linkTemplateMap
+        myDiagram.linkTemplate =
+            Commander(go.Link,  // the whole link panel
+                {
+                    curve: go.Link.Bezier, adjusting: go.Link.Stretch,
+                    reshapable: true, relinkableFrom: true, relinkableTo: true,
+                    toShortLength: 3
+                },
+                new go.Binding("points").makeTwoWay(),
+                new go.Binding("curviness"),
+                Commander(go.Shape,  // the link shape
+                    { strokeWidth: 1.5 }),
+                Commander(go.Shape,  // the arrowhead
+                    { toArrow: "standard", stroke: null}),
+                // Commander(go.Shape,  // the arrowhead
+                //     { fromArrow: "backward", stroke: null}),
+                Commander(go.Panel, "Auto",
+                    Commander(go.Shape,  // the label background, which becomes transparent around the edges
+                        {
+                            fill: Commander(go.Brush, "Radial",
+                                { 0: "rgb(240, 240, 240)", 0.3: "rgb(240, 240, 240)", 1: "rgba(240, 240, 240, 0)" }),
+                            stroke: null
+                        }),
+                    Commander(go.TextBlock,   // the label text
+                        {
+                            textAlign: "center",
+                            font: "19pt helvetica, arial, sans-serif",
+                            margin: 4,
+                            editable: true  // enable in-place editing
+                        },
+                        // editing the text automatically updates the model data
+                        new go.Binding("text").makeTwoWay())
+                )
+            );
+
+
+        var palette =
+            Commander(go.Palette, "myPaletteDiv",  // create a new Palette in the HTML DIV element
+                {
+                    // share the template map with the Palette
+                    nodeTemplateMap: myDiagram.nodeTemplateMap,
+                    autoScale: go.Diagram.Uniform  // everything always fits in viewport
+                });
+
+        palette.model.nodeDataArray = [
+            { category: "attribute" },
+            { category: "entity" },
+            { category: "ability"}
+        ];
+
+        // read in the JSON-format data from the "mySavedModel" element
+        loadFile(filename);
+
+    }
+    function merge(){
+        document.itemsForm.action="/merge";
+        document.itemsForm.submit();
+    }
+</script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script type="text/javascript"  th:src="@{asserts/js/bootstrap.js}"></script>
+<script type="text/javascript" src="/asserts/js/zml.js"></script>
+<script type="text/javascript" src="/asserts/js/bootstrap.bundle.js"></script>
+<script type="text/javascript" src="/asserts/js/go.js"></script>
+</body>
+</html>

@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Page Flow</title>
+	<meta name="description" content="A workflow diagram showing navigation between web pages, with an editable list of comments and to-dos." />
+	<!-- Copyright 1998-2018 by Northwoods Software Corporation. -->
+	<meta charset="UTF-8">
+	<link rel="stylesheet"  th:href="@{asserts/css/bootstrap.css}">
+	<link rel="stylesheet"  th:href="@{asserts/css/font-awesome.min.css}">
+</head>
+<body onload="init()">
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+	<a class="navbar-brand" href="#">Concept</a>
+	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+	</button>
+	<div class="collapse navbar-collapse" id="navbarNavDropdown">
+		<ul class="navbar-nav">
+			<li class="nav-item">
+				<a class="btn btn-warning fa-lg" href="#" onclick="save()"><i class="fa fa-save fa-lg pull-left"></i> Save </a>
+			</li>
+			<div class="nav-item dropdown">
+				<a class="btn btn-danger fa-lg" onclick="loadNamedelete()" data-toggle="dropdown">
+					<i class="fa fa-trash-o fa-lg"></i> Delete</a>
+				</a>
+				<ul class="dropdown-menu" id="Concept_list2">
+
+				</ul>
+			</div>
+			<li class="nav-item dropdown">
+				<a class="btn btn-success fa-lg" data-toggle="dropdown" href="#">
+					<i class="fa fa-plus fa-lg pull-left"></i> Add File
+				</a>
+				<div class="dropdown-menu">
+					<ul class="input-group margin-bottom-sm">
+						<a class="input-group-addon"><i class="fa fa-file-text fa-fg"></i></a>
+						<input class="form-control" type="text" placeholder="filename" id="addfilename">
+						<a class="input-group-addon" href="#" onclick="saveFilename()"><i class="fa fa-plus fa-lg"></i></a>
+					</ul>
+				</div>
+			</li>
+			<div class="nav-item dropdown">
+				<a class="btn btn-primary fa-lg" onclick="loadName()" data-toggle="dropdown">
+					<i class="fa fa-file-text fa-lg pull-left"></i> Load
+				</a>
+				<ul class="dropdown-menu" id="Concept_list">
+
+				</ul>
+			</div>
+			<li class="nav-item">
+				<a class="btn btn-warning fa-lg" href="/thumbNail"><i class="fa fa-save fa-lg pull-left"></i> ThumbNail </a>
+			</li>
+			<li class="nav-item">
+				<a class="btn btn-warning fa-lg" onclick="layout()"><i class="fa fa-save fa-lg pull-left"></i> layout </a>
+			</li>
+		</ul>
+	</div>
+</nav>
+
+<div id="sample">
+	<div style="width: 100%; display: flex; justify-content: space-between">
+		<div id="myPaletteDiv" style="width: 100px; margin-right: 2px; background-color: whitesmoke; border: solid 1px black"></div>
+		<div id="myDiagramDiv" style="flex-grow: 1; height: 688px; border: solid 1px black"></div>
+	</div>
+</div>
+<!--<form enctype="multipart/form-data">-->
+	<!--<input type="file" name="picFile" id="image"/>-->
+	<!--<input type="text" id="txt"/>-->
+<!--</form>-->
+
+<script id="code" th:inline="JavaScript">
+	function saveImg() {
+        html2canvas(document.getElementById("myDiagramDiv"), {
+            allowTaint: true,
+            useCORS: true,
+            onrendered: function(canvas) {
+				var type = 'png';
+				//得到以 base64 编码的 dataURL
+				var imgData = canvas.toDataURL(type);
+
+                $.ajax({
+                    type: "POST",
+                    url: "saveImg",
+                    //下面这句是指定数据以json形式传递
+                    // contentType: "application/json; charset=utf-8",
+                    /* 扔过去的格式 */
+                    /* 一致 */
+                    /* 扔过去的东西 */
+                    data:{base64:imgData},
+                    // dataType: "json",
+                    success:function(data){
+                        alert("保存成功");
+                        // data=JSON.stringify(data);
+                        // alert(data);
+                    }
+                });
+
+
+                // var saveFile = function (data, filename) {
+                //     //创建指定命名空间下的元素结点
+                //     var save_link = document.createElementNS('http://www.w3.org/1999/xhtml', 'a');
+                //     save_link.href = data;
+                //     save_link.download = filename;
+				//
+                //     //创建
+                //     var event = document.createEvent('MouseEvents');
+                //     //初始化
+                //     event.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+                //     save_link.dispatchEvent(event);
+                // };
+				//
+                // // 下载后的图片名
+                // var filename = 'test' + (new Date()).getTime() + '.' + type;
+                // // download
+                // saveFile(imgData, filename);
+            }
+        });
+    }
+
+    function layout() {
+        myDiagram.layoutDiagram(true);
+    }
+
+    function load() {
+        var example=
+        { "class": "go.GraphLinksModel",
+            "nodeDataArray": [
+            {"category":"attribute", "key":-1, "loc":"966.9216583705451 -2651.021707637922", "text":"xsd:integer"},
+            {"category":"object", "key":-2, "loc":"-89.67456975231516 -26.32647919334022"},
+            {"category":"entity", "key":-4, "loc":"517.7784066437835 -1578.9763673123973", "text":"order"},
+            {"category":"attribute", "key":-5, "loc":"1931.518529788292 -1829.5822103487612", "text":"xsd:string"},
+            {"category":"attribute", "key":-6, "loc":"1037.9994994238218 -2060.947102703508", "text":"xsd:integer"},
+            {"category":"attribute", "key":-7, "loc":"1649.807786065564 -1457.5669240279108", "text":"xsd:string"},
+            {"category":"attribute", "key":-8, "loc":"-793.8110665026437 -1861.2521208364587", "text":"xsd:integer"},
+            {"category":"attribute", "key":-9, "loc":"515.8603706544172 -2410.6308413093907", "text":"xsd:float"},
+            {"category":"attribute", "key":-10, "loc":"952.2015622379399 -1200.2076465923576", "text":"xsd:float"},
+            {"category":"attribute", "key":-11, "loc":"-106.6328119648422 -2454.4263180295166", "text":"xsd:string"},
+            {"category":"attribute", "key":-12, "loc":"1928.4616726905956 -1181.6372248337627", "text":"xsd:boolean"},
+            {"category":"attribute", "key":-13, "loc":"2062.6422541651164 -2159.045397807625", "text":"xsd:dateTimeStamp"},
+            {"category":"attribute", "key":-14, "loc":"-1344.254931413727 -2241.6762546100194", "text":"xsd:dateTimeStamp"},
+            {"category":"attribute", "key":-15, "loc":"-302.8883282997905 -2081.481491022664", "text":"xsd:integer"},
+            {"category":"entity", "key":-16, "loc":"-1382.4248367493815 -955.3794638678473", "text":"seller"},
+            {"category":"attribute", "key":-17, "loc":"-2101.818634532734 -1234.3364262473578", "text":"xsd:integer"},
+            {"category":"attribute", "key":-18, "loc":"-2029.3453024601395 -753.9917006271294", "text":"xsd:float"},
+            {"category":"entity", "key":-19, "loc":"-1587.7261968720927 -166.0898943603399", "text":"rural_partner"},
+            {"category":"attribute", "key":-20, "loc":"-3053.693726671844 -278.68576804530613", "text":"xsd:integer"},
+            {"category":"attribute", "key":-21, "loc":"-2273.506856444498 -476.15857353342477", "text":"xsd:string"},
+            {"category":"attribute", "key":-22, "loc":"-1514.6737507521598 548.9933122519672", "text":"xsd:float"},
+            {"category":"attribute", "key":-23, "loc":"-2828.9571530300864 -68.481749174854", "text":"xsd:string"},
+            {"category":"attribute", "key":-24, "loc":"-2924.5900082301773 296.3849186714993", "text":"xsd:string"},
+            {"category":"attribute", "key":-25, "loc":"-2329.563564491569 468.7187015967521", "text":"xsd:dateTimeStamp"},
+            {"category":"attribute", "key":-26, "loc":"-1120.4129378622272 838.558154704394", "text":"xsd:dateTimeStamp"},
+            {"category":"entity", "key":-27, "loc":"1359.7947684752935 -292.2078052359077", "text":"TB"},
+            {"category":"attribute", "key":-28, "loc":"664.5977034741657 -372.56561795885557", "text":"xsd:string"},
+            {"category":"entity", "key":-29, "loc":"363.35550884185545 -519.2722890738806", "text":"rTB"},
+            {"category":"attribute", "key":-30, "loc":"94.9774227798681 55.963872224449005", "text":"xsd:string"},
+            {"category":"ability", "key":-3, "loc":"705.0249504463198 617.6431622866623", "text":"show_warehouse_orders"},
+            {"category":"ability", "key":-32, "loc":"-879.8599159562509 -301.7125398545403", "text":"generate_rural_service_form"},
+            {"category":"ability", "key":-33, "loc":"1796.8801110531933 65.94998614213864", "text":"show_order_details"},
+            {"category":"ability", "key":-34, "loc":"1060.5307909452504 236.54577637672395", "text":"add_rural_information"},
+            {"category":"ability", "key":-35, "loc":"-1240.6125117792437 -633.2314886535196", "text":"confirm_order"},
+            {"category":"ability", "key":-36, "loc":"-477.62174598564565 305.8774167891183", "text":"confirm_warehouse_orders"},
+            {"category":"ability", "key":-37, "loc":"-1426.5445007771557 -1412.4299874354222", "text":"add_rural_information"}
+        ],
+            "linkDataArray": [
+            {"from":-4, "to":-1, "points":[641.5518830723797,-1578.9180786450872,805.8563388609199,-1891.4411180044763,965.5523259560664,-2218.9119606631148,1119.2384954636495,-2560.35459062738], "text":"order_id"},
+            {"from":-4, "to":-5, "points":[708.475891064732,-1544.4932584976527,1087.416796525919,-1620.9330008611155,1457.3293359277502,-1686.1341945380836,1931.5246088796011,-1760.324494278639], "text":"customer_name"},
+            {"from":-4, "to":-6, "points":[672.0091323534724,-1578.8125337371755,837.8578488647232,-1728.9608501203413,998.4206412919665,-1860.2025735959003,1148.540563375378,-1970.4423871457288], "text":"customer_phone"},
+            {"from":-4, "to":-7, "points":[708.4844310622767,-1518.5657156682319,1052.098952584013,-1494.6176974515147,1343.167468979753,-1466.0719292747006,1649.8111234931466,-1429.8497016690183], "text":"customer_address"},
+            {"from":-4, "to":-8, "points":[517.7883558478679,-1544.6469058609794,160.42362413709924,-1617.108555303779,-174.28996059410557,-1695.8156082023577,-454.601762096374,-1770.912382052509], "text":"amount"},
+            {"from":-4, "to":-9, "points":[617.7710790911732,-1578.9745076504346,638.9471406796109,-1828.0304445545319,649.4744506834053,-2074.924475594041,649.3502681379874,-2319.921218380443], "text":"price"},
+            {"from":-4, "to":-10, "points":[692.1179469521543,-1472.5256873147837,807.1944912778038,-1394.8080074472957,917.8284960205763,-1307.6318512605583,1036.2230457620747,-1200.0452705239788], "text":"coupon"},
+            {"from":-4, "to":-11, "points":[581.2142291227882,-1578.9059018705877,413.56118700038803,-1860.8651344660568,244.46482420392365,-2123.3253410660104,76.74591079138375,-2363.806238990306], "text":"order_status"},
+            {"from":-4, "to":-12, "points":[708.467186778843,-1498.6568912736084,1123.484696207875,-1382.213629862546,1523.965814607163,-1279.2147573907775,1932.4949872946684,-1180.9896053410855], "text":"pay_status"},
+            {"from":-4, "to":-13, "points":[708.3284446081256,-1559.536236333074,1108.0958525254957,-1702.8351790523907,1493.97899062603,-1832.2376174172748,2227.2830391626694,-2068.682535514729], "text":"create_time"},
+            {"from":-4, "to":-14, "points":[519.6050444667876,-1565.374754685094,40.43580168338205,-1770.8712052474878,-431.6366984367817,-1962.1254273820564,-923.1006870236791,-2151.2866499895745], "text":"update_time"},
+            {"from":-4, "to":-15, "points":[541.7611512272815,-1578.776046320843,343.8193081946687,-1727.6069297324384,143.7014854449776,-1864.9522981925825,-58.56880368888565,-1991.0064143432908], "text":"rural_warehouse_id"},
+            {"from":-16, "to":-17, "points":[-1382.04540563463,-937.4817579597154,-1533.128866474349,-993.4391298876182,-1687.6446579540195,-1062.0917997762779,-1843.8035057165766,-1143.8940357408617], "text":"seller_id"},
+            {"from":-16, "to":-18, "points":[-1381.5472588469727,-864.1013886556397,-1505.4465740799162,-816.4524475565916,-1624.8725094372473,-778.7206573509822,-1762.5882043382267,-742.7878340065346], "text":"capital"},
+            {"from":-19, "to":-20, "points":[-1587.7251957092626,-125.65628883856496,-1916.8520672965894,-146.6172282721094,-2265.137513187925,-174.0548939782132,-2709.0990994880835,-216.68604258208057], "text":"rural_warehouse_id"},
+            {"from":-19, "to":-21, "points":[-1521.7635364405803,-165.7652087563888,-1694.0486125138068,-230.89350740717435,-1863.4668597824473,-304.05122887707023,-2030.3975797953842,-385.72744086199265], "text":"username"},
+            {"from":-19, "to":-22, "points":[-1377.5248125657859,-58.81202099764256,-1369.3865227423494,192.39085475293064,-1371.0880078304301,395.6947123062678,-1378.897622364055,548.9940049022156], "text":"capital"},
+            {"from":-19, "to":-23, "points":[-1587.7238893836975,-92.36344029408188,-1938.710913011562,-58.00313888348174,-2251.1197653287954,-37.46711063514117,-2525.176740826832,-28.46791115024658], "text":"password"},
+            {"from":-19, "to":-24, "points":[-1559.351476738538,-59.169803201103804,-1947.8392088346382,55.6424386039195,-2312.596470545059,175.3101911488809,-2648.033229309405,296.7150756623528], "text":"rural_warehouse_address"},
+            {"from":-19, "to":-25, "points":[-1429.437588737929,-58.94666773366153,-1593.2813967866814,115.72960155452274,-1775.4325741861326,292.9143485207523,-1974.019350931947,468.88753828035385], "text":"create_time"},
+            {"from":-19, "to":-26, "points":[-1346.654029817434,-58.88499587025541,-1176.6959438457634,218.40211463042212,-1006.3702966242088,519.0385655225946,-839.7698126639666,838.6154803885403], "text":"update_time"},
+            {"from":-27, "to":-28, "points":[1359.7953321454881,-241.42657072191875,1232.9962742404161,-247.9365870232977,1110.1112233434462,-264.44466230147384,968.3670912599961,-294.3114670845351], "text":"field_id"},
+            {"from":-29, "to":-30, "points":[420.7295366104346,-412.0100333374526,383.388541668144,-271.0326377553398,331.74193246731704,-113.51451430204393,264.92425723484484,55.999382503193324], "text":"field_id"},
+            {"from":-27, "to":-4, "points":[1383.6738878552715,-292.12184068055814,1127.0306421753733,-676.4771921376839,882.1103219883942,-1067.437764615082,644.3821197135203,-1471.7663123261361], "text":"sl:read"},
+            {"from":-29, "to":-4, "points":[432.1180327266761,-519.2717587370527,413.78319357485503,-850.9489686642814,410.9421148130118,-1053.8855129828673,590.5515217525686,-1471.7374202981696], "text":"sl:read"},
+            {"from":-19, "to":-4, "points":[-1345.8793646274771,-166.0138693839466,-985.8637684962786,-744.5207691639666,24.343487328087374,-1061.0131314431583,545.7814357205094,-1471.8873822321777], "text":"sl:write"},
+            {"from":-19, "to":-4, "points":[-1282.3709829884892,-165.8309734243168,-632.070672897837,-524.739885455269,-76.23957872094147,-989.4850841589289,544.7170486183238,-1471.8903868632003], "text":"sl:read"},
+            {"from":-27, "to":-4, "points":[1390.678619589564,-292.1466577575213,1168.8107736490774,-705.0105317736989,922.2437527267772,-1097.407381353753,651.5767869752486,-1471.7920459244685], "text":"sl:write"},
+            {"from":-29, "to":-4, "points":[477.40608771892926,-519.1627520796707,680.0995960621831,-773.4460206775824,583.1417690531104,-1152.3903412689951,608.889083234687,-1471.6997576580516], "text":"sl:write"},
+            {"from":-16, "to":-4, "points":[-1188.187273110587,-935.8777262335332,-623.6477384144974,-1135.1209606171176,-718.4808699331809,-1263.9941230305958,517.7877666537424,-1506.6249575229167], "text":"sl:read"},
+            {"from":-16, "to":-4, "points":[-1188.060464858482,-930.7782292487108,-614.4980143746303,-1102.7177632297726,-45.83420530033716,-1289.472639457925,517.94319730205,-1491.086079745198], "text":"sl:write"},
+            {"from":-3, "to":-4, "points":[1076.0505184298947,617.6563931875041,912.1509773098447,-72.90561784599599,761.4313178013,-769.3601510733428,623.9054918142584,-1471.707994075466], "text":"sl:read"},
+            {"from":-32, "to":-4, "points":[-409.1506603347963,-301.60654988742994,-100.70095485257889,-692.4572119566005,225.51899772607482,-1084.2046097627854,565.936045306415,-1471.8232041291317], "text":"sl:read"},
+            {"from":-33, "to":-4, "points":[2052.324209306961,66.08706193361101,1571.3579263032527,-444.8372442301187,1109.4493582749187,-955.0328925001011,659.5631497876095,-1471.8205304413607], "text":"sl:read"},
+            {"from":-34, "to":-33, "points":[1509.9483344168243,236.86470879768996,1603.931547830661,198.06064382347728,1700.800714488156,170.2423429199645,1801.4173099905897,156.10835583870403], "text":"sl:read"},
+            {"from":-35, "to":-4, "points":[-950.7350139797371,-632.989196049882,-465.2201251058731,-926.0973999477055,-106.44161036047126,-1263.9941230305958,517.9872027592576,-1490.7814687658808], "text":"sl:write"},
+            {"from":-36, "to":-3, "points":[73.03992703465815,396.2425576769949,337.92699344338024,483.31987186329604,608.1404665048777,557.2739486483334,883.6522230864375,618.0350578007036], "text":"sl:read"},
+            {"from":-36, "to":-32, "points":[-106.3623294134789,306.01051998964687,-248.6051268042802,151.9137574518898,-355.3549024308154,-20.925793171644603,-427.4350488398118,-211.03499157514108], "text":"sl:write"},
+            {"from":-37, "to":-4, "points":[-759.5525823880304,-1388.4295522707878,-328.2272162000873,-1416.3831452718446,96.81826280762891,-1457.850054215197,517.7827125462488,-1512.7422605594957], "text":"sl:read"},
+            {"from":-29, "to":-3, "points":[468.11539110208423,-412.0702942776137,672.8656749972173,-83.37925988882456,865.4898713774022,251.12517438514644,1062.4362009706783,617.7023903951922], "text":"sl:write"},
+            {"from":-29, "to":-32, "points":[363.3791179090352,-442.93784214300985,172.62174622188036,-382.04359906303154,-21.765939346389477,-335.05921699833567,-203.55623278213397,-301.30422925884244], "text":"sl:write"},
+            {"from":-29, "to":-34, "points":[499.2097462390891,-418.98359645224076,785.4630398273168,-213.7428460853232,1062.6701605400642,2.8414486426900663,1340.2556764692617,236.724145640201], "text":"sl:write"},
+            {"from":-27, "to":-33, "points":[1480.0206145956447,-210.90234320486616,1657.5973898600182,-129.48422025947258,1835.6877986986372,-37.791568296057726,2016.4959870062432,66.20131841449373], "text":"sl:write"},
+            {"from":-16, "to":-35, "points":[-1234.812111330907,-848.2374156148846,-1154.53997385797,-764.1727097600451,-1094.0194348814068,-689.0022840116354,-1056.7517175386633,-633.1439757508739], "text":"sl:write"},
+            {"from":-19, "to":-36, "points":[-1207.8444629619005,-59.16338197174693,-859.3005744784875,49.3451648962924,-515.7263442871408,171.1020556897446,-177.12765539518932,306.19176701053505], "text":"sl:write"},
+            {"from":-19, "to":-3, "points":[-1326.558735235983,-58.95588479226437,-915.6048447848565,357.83491638911465,-365.78588045029056,666.2197718290297,705.0249514476029,663.7618028456757], "text":"sl:read"},
+            {"from":-29, "to":-36, "points":[398.2911409390867,-412.0802402908411,239.1917660578211,-178.55700585681663,92.59707054547235,62.29826824080818,-39.77313980868735,305.938532786194], "text":"sl:read"},
+            {"from":-16, "to":-37, "points":[-1269.092121937493,-955.3582423578798,-1232.102623983155,-1081.0153054334994,-1181.7016326604878,-1200.977705381493,-1116.9873701822173,-1321.7783024560267], "text":"sl:read"}
+        ]};
+		myDiagram.model = go.Model.fromJson(example);
+    }
+
+    function white(){
+        var white={
+            "nodeDataArray":[{"category":"entity", "key":-2, "loc":"-235.5 -57"}],
+            "linkDataArray":[]
+		}
+        myDiagram.model = go.Model.fromJson(white);
+	}
+
+    function save(){
+        //这个得到的是一个字符串
+        var test=myDiagram.model.toJson();
+        test=JSON.parse(test);
+        test.filename=curFile;
+
+        html2canvas(document.getElementById("myDiagramDiv"), {
+            allowTaint: true,
+            useCORS: true,
+            onrendered: function(canvas) {
+                var type = 'png';
+                //得到以 base64 编码的 dataURL
+                var imgData = canvas.toDataURL(type);
+				test.base64=imgData;
+                test=JSON.stringify(test);
+
+                $.ajax({
+                    type: "POST",
+                    url: "save",
+                    contentType: "application/json; charset=utf-8",
+                    /* 扔过去的格式 */
+                    /* 一致 */
+                    /* 扔过去的东西 */
+                    data:test,
+                    dataType: "json",
+                    success:function(data){
+                        alert("保存成功");
+                        // data=JSON.stringify(data);
+                        // alert(data);
+                    }
+                });
+
+            }
+        });
+
+    }
+
+    function saveFilename() {
+		curFile=$("#addfilename").val();
+		var data={
+		    "name":curFile
+		};
+		data=JSON.stringify(data);
+        $.ajax({
+            type: "POST",
+            url: "saveName",
+            contentType: "application/json; charset=utf-8",
+            /* 扔过去的格式 */
+            /* 一致 */
+            /* 扔过去的东西 */
+            data:data,
+            dataType: "json",
+            success:function(data){
+            }
+        });
+        white();
+    }
+
+    function loadName() {
+        $.ajax({
+            type: "GET",
+            url: "loadName",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success:function(data){
+                var list =$("#Concept_list");
+                //这句话终于等到你
+                list.find("li").remove();
+                for(var i=0;i<data.length;i++){
+                    var curname=data[i].name;
+                    //这里太细节了
+					//当函数中的参数来自于动态加载html的js，
+					// 若参数是数字，则showi( '+x+')；
+					// 若参数是字符串，则showi(\'  '+x' \');
+                    list.append('<li onclick="loadFile(\''+curname+'\')"><a class="dropdown-item" href="#">'+
+                        curname+
+                        '</a></li>');
+                }
+                // data=JSON.stringify(data);
+                // alert(data);//只能输出字符串
+            }
+        });
+    }
+
+    function loadNamedelete(){
+        $.ajax({
+            type: "GET",
+            url: "loadName",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success:function(data){
+                var list =$("#Concept_list2");
+                //这句话终于等到你
+                list.find("li").remove();
+                for(var i=0;i<data.length;i++){
+                    var curname=data[i].name;
+                    //这里太细节了
+                    //当函数中的参数来自于动态加载html的js，
+                    // 若参数是数字，则showi( '+x+')；
+                    // 若参数是字符串，则showi(\'  '+x' \');
+                    list.append('<li onclick="deleteFile(\''+curname+'\')"><a class="dropdown-item" href="#">'+
+                        curname+
+                        '</a></li>');
+                }
+                // data=JSON.stringify(data);
+                // alert(data);//只能输出字符串
+            }
+        });
+    }
+
+    function deleteFile(queryfilename) {
+        var senddata={
+            "name":queryfilename
+        };
+        senddata=JSON.stringify(senddata);
+        $.ajax({
+            type: "POST",
+            url: "deleteFile",
+            contentType: "application/json; charset=utf-8",
+            /* 扔过去的格式 */
+            /* 一致 */
+            /* 扔过去的东西 */
+            data:senddata,
+            dataType: "json",
+            success:function(data){
+                alert("删除成功");
+            }
+        });
+    }
+
+    function thumbNail() {
+        $.ajax({
+            type: "GET",
+            url: "thumbNail",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success:function(data){
+            }
+        });
+    }
+    
+    function loadFile(queryfilename) {
+		var senddata={
+		    "name":queryfilename
+		};
+        senddata=JSON.stringify(senddata);
+        $.ajax({
+            type: "POST",
+            url: "loadFile",
+            contentType: "application/json; charset=utf-8",
+            /* 扔过去的格式 */
+            /* 一致 */
+            /* 扔过去的东西 */
+            data:senddata,
+            dataType: "json",
+            success:function(data){
+                curFile=data.filename;
+                myDiagram.model = go.Model.fromJson(data);
+                // data=JSON.stringify(data);
+                // alert(data);
+            }
+        });
+    }
+
+    function init() {
+	    var filename=[[${fn}]];
+        // if (window.goSamples) goSamples();  // init for these samples -- you don't need to call this
+        var Commander = go.GraphObject.make;  // for conciseness in defining templates
+
+        var yellowgrad = Commander(go.Brush, "Linear", { 0: "rgb(254, 201, 0)", 1: "rgb(254, 162, 0)" });
+        var greengrad = Commander(go.Brush, "Linear", { 0: "#98FB98", 1: "#9ACD32" });
+        var bluegrad = Commander(go.Brush, "Linear", { 0: "#B0E0E6", 1: "#87CEEB" });
+        var redgrad = Commander(go.Brush, "Linear", { 0: "#C45245", 1: "#871E1B" });
+        var whitegrad = Commander(go.Brush, "Linear", { 0: "#F0F8FF", 1: "#E6E6FA" });
+
+        var bigfont = "bold 13pt Helvetica, Arial, sans-serif";
+        var smallfont = "bold 11pt Helvetica, Arial, sans-serif";
+
+        // Common text styling
+        function textStyle() {
+            return {
+                margin: 6,
+                wrap: go.TextBlock.WrapFit,
+                textAlign: "center",
+                editable: true,
+                font: "19pt helvetica, arial, sans-serif"
+            }
+        }
+
+        myDiagram =
+            Commander(go.Diagram, "myDiagramDiv",
+                {
+                    // have mouse wheel events zoom in and out instead of scroll up and down
+                    "toolManager.mouseWheelBehavior": go.ToolManager.WheelZoom,
+                    allowDrop: true,  // support drag-and-drop from the Palette
+                    initialAutoScale: go.Diagram.Uniform,
+                    "linkingTool.direction": go.LinkingTool.ForwardsOnly,
+                    initialContentAlignment: go.Spot.Center,
+                    layout: Commander(go.LayeredDigraphLayout, { isInitial: false, isOngoing: false, layerSpacing: 50 }),
+                    "undoManager.isEnabled": true
+                });
+
+        // when the document is modified, add a "*" to the title and enable the "Save" button
+        myDiagram.addDiagramListener("Modified", function(e) {
+            var button = document.getElementById("SaveButton");
+            if (button) button.disabled = !myDiagram.isModified;
+            var idx = document.title.indexOf("*");
+            if (myDiagram.isModified) {
+                if (idx < 0) document.title += "*";
+            } else {
+                if (idx >= 0) document.title = document.title.substr(0, idx);
+            }
+        });
+
+        //右上角小加号
+        var defaultAdornment =
+            Commander(go.Adornment, "Spot",
+                Commander(go.Panel, "Auto",
+                    Commander(go.Shape, { fill: null, stroke: "dodgerblue", strokeWidth: 4 }),
+                    Commander(go.Placeholder)),
+                // the button to create a "next" node, at the top-right corner
+                Commander("Button",
+                    { alignment: go.Spot.TopRight,
+                        click: addNodeAndLink },  // this function is defined below
+                    new go.Binding("visible", "", function(a) { return !a.diagram.isReadOnly; }).ofObject(),
+                    Commander(go.Shape, "PlusLine", { desiredSize: new go.Size(6, 6) })
+                )
+            );
+
+
+        myDiagram.nodeTemplateMap.add("attribute",
+            Commander(go.Node, "Auto",
+                new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
+                Commander(go.Shape, "RoundedRectangle",
+                    { fill: bluegrad,
+                        portId: "",
+                        fromLinkable: true, fromLinkableSelfNode: true, fromLinkableDuplicates: true,
+                        toLinkable: true, toLinkableSelfNode: true, toLinkableDuplicates: true,
+                        cursor: "pointer",
+                        fromEndSegmentLength: 40}),
+                Commander(go.TextBlock, "attribute", textStyle(),
+                    new go.Binding("text", "text").makeTwoWay())
+            ));
+
+        myDiagram.nodeTemplateMap.add("entity",
+            Commander(go.Node, "Auto",
+                new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
+                // define the node's outer shape, which will surround the TextBlock
+                Commander(go.Shape, "RoundedRectangle",
+                    {
+                        parameter1: 20,  // the corner has a large radius
+                        fill: Commander(go.Brush, "Linear", { 0: "rgb(254, 201, 0)", 1: "rgb(254, 162, 0)" }),
+                        stroke: null,
+                        portId: "",  // this Shape is the Node's port, not the whole Node
+                        fromLinkable: true, fromLinkableSelfNode: true, fromLinkableDuplicates: true,
+                        toLinkable: true, toLinkableSelfNode: true, toLinkableDuplicates: true,
+                        cursor: "pointer"
+                    }),
+                Commander(go.TextBlock,"entity",textStyle(),
+                    // {
+                    //     font: "bold 11pt helvetica, bold arial, sans-serif",
+                    //     editable: true  // editing the text automatically updates the model data
+                    // },
+                    new go.Binding("text").makeTwoWay())
+            ));
+
+
+        myDiagram.nodeTemplateMap.add("ability",
+            Commander(go.Node, "Auto",
+                new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
+                Commander(go.Shape, "RoundedRectangle",
+                    { fill: greengrad,
+                        portId: "",
+                        fromLinkable: true, fromLinkableSelfNode: true, fromLinkableDuplicates: true,
+                        toLinkable: true, toLinkableSelfNode: true, toLinkableDuplicates: true,
+                        cursor: "pointer",
+                        fromEndSegmentLength: 40}),
+                Commander(go.TextBlock, "ability", textStyle(),
+                    new go.Binding("text", "text").makeTwoWay())
+            ));
+
+
+        // clicking the button of a default node inserts a new node to the right of the selected node,
+        // and adds a link to that new node
+        function addNodeAndLink(e, obj) {
+            var adorn = obj.part;
+            if (adorn === null) return;
+            e.handled = true;
+            var diagram = adorn.diagram;
+            diagram.startTransaction("Add State");
+            // get the node data for which the user clicked the button
+            var fromNode = adorn.adornedPart;
+            var fromData = fromNode.data;
+            // create a new "State" data object, positioned off to the right of the adorned Node
+            var toData = { text: "new" };
+            var p = fromNode.location;
+            toData.loc = p.x + 200 + " " + p.y;  // the "loc" property is a string, not a Point object
+            // add the new node data to the model
+            var model = diagram.model;
+            model.addNodeData(toData);
+            // create a link data from the old node data to the new node data
+            var linkdata = {};
+            linkdata[model.linkFromKeyProperty] = model.getKeyForNodeData(fromData);
+            linkdata[model.linkToKeyProperty] = model.getKeyForNodeData(toData);
+            // and add the link data to the model
+            model.addLinkData(linkdata);
+            // select the new Node
+            var newnode = diagram.findNodeForData(toData);
+            diagram.select(newnode);
+            diagram.commitTransaction("Add State");
+        }
+
+        // // replace the default Link template in the linkTemplateMap
+        // myDiagram.linkTemplate =
+        //   Commander(go.Link,  // the whole link panel
+        //     new go.Binding("points").makeTwoWay(),
+        //     { curve: go.Link.Bezier, toShortLength: 15 },
+        //     new go.Binding("curviness", "curviness"),
+        //     Commander(go.Shape,  // the link shape
+        //       { stroke: "#2F4F4F", strokeWidth: 2.5 }),
+        //     Commander(go.Shape,  // the arrowhead
+        //       { toArrow: "kite", fill: "#2F4F4F", stroke: null, scale: 2 })
+        // );
+        //
+        // myDiagram.linkTemplateMap.add("Comment",
+        //   Commander(go.Link, { selectable: true },
+        //     Commander(go.Shape, { strokeWidth: 2, stroke: "darkgreen" })));
+
+        // replace the default Link template in the linkTemplateMap
+        myDiagram.linkTemplate =
+            Commander(go.Link,  // the whole link panel
+                {
+                    curve: go.Link.Bezier, adjusting: go.Link.Stretch,
+                    reshapable: true, relinkableFrom: true, relinkableTo: true,
+                    toShortLength: 3
+                },
+                new go.Binding("points").makeTwoWay(),
+                new go.Binding("curviness"),
+                Commander(go.Shape,  // the link shape
+                    { strokeWidth: 1.5 }),
+                Commander(go.Shape,  // the arrowhead
+                    { toArrow: "standard", stroke: null}),
+                // Commander(go.Shape,  // the arrowhead
+                //     { fromArrow: "backward", stroke: null}),
+                Commander(go.Panel, "Auto",
+                    Commander(go.Shape,  // the label background, which becomes transparent around the edges
+                        {
+                            fill: Commander(go.Brush, "Radial",
+                                { 0: "rgb(240, 240, 240)", 0.3: "rgb(240, 240, 240)", 1: "rgba(240, 240, 240, 0)" }),
+                            stroke: null
+                        }),
+                    Commander(go.TextBlock,   // the label text
+                        {
+                            textAlign: "center",
+                            font: "19pt helvetica, arial, sans-serif",
+                            margin: 4,
+                            editable: true  // enable in-place editing
+                        },
+                        // editing the text automatically updates the model data
+                        new go.Binding("text").makeTwoWay())
+                )
+            );
+
+
+        var palette =
+            Commander(go.Palette, "myPaletteDiv",  // create a new Palette in the HTML DIV element
+                {
+                    // share the template map with the Palette
+                    nodeTemplateMap: myDiagram.nodeTemplateMap,
+                    autoScale: go.Diagram.Uniform  // everything always fits in viewport
+                });
+
+        palette.model.nodeDataArray = [
+            { category: "attribute" },
+            { category: "entity" },
+            { category: "ability"}
+        ];
+
+        // read in the JSON-format data from the "mySavedModel" element
+        loadFile(filename);
+
+    }
+</script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://cdn.bootcss.com/html2canvas/0.5.0-beta4/html2canvas.js"></script>
+<script type="text/javascript"  th:src="@{asserts/js/bootstrap.js}"></script>
+<script type="text/javascript" src="/asserts/js/bootstrap.bundle.js"></script>
+<script type="text/javascript" src="/asserts/js/go.js"></script>
+</body>
+</html>
